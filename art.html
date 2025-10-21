@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>🎮 It's Oct 22 🎮</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          #160119 0%,
+          #5b055b 25%,
+          #2d1b69 50%,
+          #5c37b3 75%,
+          #250816 100%
+        );
+        background-attachment: fixed;
+        color: #fff;
+        font-family: "Orbitron", monospace;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* Static Background Grid - No animation for performance */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(
+            rgba(236, 72, 153, 0.05) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+        background-size: 50px 50px;
+        z-index: -2;
+      }
+
+      h1 {
+        font-size: 2.5em;
+        font-weight: 900;
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, #ec4899, #8b5cf6, #a855f7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+        text-align: center;
+        letter-spacing: 3px;
+      }
+
+      #grid {
+        position: relative;
+        width: 1200px;
+        height: 550px;
+        border: 3px solid rgba(168, 85, 247, 0.5);
+        background: linear-gradient(135deg, #000, #1a0d1a, #000);
+        overflow: hidden;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(236, 72, 153, 0.2),
+          inset 0 0 30px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Simplified border glow for better performance */
+
+      .dot {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #ec4899;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      button {
+        margin-top: 25px;
+        margin-bottom: 20px;
+        padding: 15px 30px;
+        border: 3px solid rgba(168, 85, 247, 0.5);
+        border-radius: 15px;
+        font-size: 18px;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        cursor: pointer;
+        background: linear-gradient(135deg, #000, #1a0d1a, #000);
+        color: #ec4899;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 30px rgba(236, 72, 153, 0.2),
+          inset 0 0 30px rgba(0, 0, 0, 0.3);
+      }
+
+      button:hover {
+        color: #8b5cf6;
+        border-color: rgba(139, 92, 246, 0.7);
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.3),
+          inset 0 0 30px rgba(0, 0, 0, 0.3);
+      }
+
+      button:hover::before {
+        left: 100%;
+      }
+
+      button:active {
+        transform: translateY(-1px) scale(1.02);
+      }
+
+      /* Gaming HUD Elements */
+      .hud-corner {
+        position: fixed;
+        width: 100px;
+        height: 100px;
+        border: 2px solid rgba(236, 72, 153, 0.6);
+        pointer-events: none;
+      }
+
+      .hud-corner.top-left {
+        top: 20px;
+        left: 20px;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .hud-corner.top-right {
+        top: 20px;
+        right: 20px;
+        border-left: none;
+        border-bottom: none;
+      }
+
+      .hud-corner.bottom-left {
+        bottom: 20px;
+        left: 20px;
+        border-right: none;
+        border-top: none;
+      }
+
+      .hud-corner.bottom-right {
+        bottom: 20px;
+        right: 20px;
+        border-left: none;
+        border-top: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Gaming HUD Corners -->
+    <div class="hud-corner top-left"></div>
+    <div class="hud-corner top-right"></div>
+    <div class="hud-corner bottom-left"></div>
+    <div class="hud-corner bottom-right"></div>
+
+    <h1>🎮 It's Oct 22  🎮</h1>
+    <div id="grid"></div>
+    <button id="startBtn">⚡ Initialize ⚡</button>
+
+    <!-- Background music -->
+    <audio id="bgMusic" loop></audio>
+
+    <!-- Music upload section -->
+    <div
+      id="musicControls"
+      style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(168, 85, 247, 0.3);
+        width: 120px;
+        max-width: 120px;
+      "
+    >
+      <div
+        style="
+          color: #ec4899;
+          font-size: 12px;
+          font-family: 'Orbitron', monospace;
+          text-align: center;
+        "
+      >
+        🎵 Music Controls
+      </div>
+      <input
+        type="file"
+        id="musicUpload"
+        accept="audio/*"
+        style="display: none"
+      />
+      <button
+        id="uploadBtn"
+        style="
+          background: linear-gradient(135deg, #ec4899, #8b5cf6);
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 10px;
+          width: 100%;
+          margin-bottom: 4px;
+        "
+      >
+        Upload
+      </button>
+      <button
+        id="defaultMusicBtn"
+        style="
+          background: linear-gradient(135deg, #8b5cf6, #a855f7);
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 10px;
+          width: 100%;
+        "
+      >
+        Default
+      </button>
+    </div>
+
+    <script>
+      const FRAME_WIDTH = 1200,
+        FRAME_HEIGHT = 550;
+      const ROWS = 100,
+        COLS = 200;
+      const CELL_WIDTH = FRAME_WIDTH / COLS,
+        CELL_HEIGHT = FRAME_HEIGHT / ROWS;
+
+      const SYNC_TIME = 15; // seconds to sync into word
+      const SCALE = 3; // scale font bigger
+      const NOISE_POINTS = 400; // number of random moving dots (reduced for performance)
+      const NOISE_SPEED = 5; // base speed for noise dots
+      const HOLD_TIME = 2; // seconds to hold the word clearly visible
+      const WORD_CYCLE_TIME = 40; // seconds for one complete word cycle (sync + hold + dissolve)
+      const TOTAL_CYCLE_TIME = 80; // total time for both words
+
+      // Cinematic rotation constants
+      const ROTATION_TIME = 6; // seconds for cinematic rotation effect
+      const ROTATION_START_TIME = 25; // Start earlier for testing (was WORD_CYCLE_TIME)
+      const ROTATION_END_TIME = ROTATION_START_TIME + ROTATION_TIME; // when rotation ends
+
+      // --- 5x5 FONT
+      const FONT_5x7 = {
+        A: ["  1  ", " 1 1 ", "1   1", "11111", "1   1", "1   1", "1   1"],
+        B: ["1111 ", "1   1", "1   1", "1111 ", "1   1", "1   1", "1111 "],
+        C: [" 1111", "1    ", "1    ", "1    ", "1    ", "1    ", " 1111"],
+        D: ["1111 ", "1   1", "1   1", "1   1", "1   1", "1   1", "1111 "],
+        E: ["11111", "1    ", "1    ", "1111 ", "1    ", "1    ", "11111"],
+        F: ["11111", "1    ", "1    ", "1111 ", "1    ", "1    ", "1    "],
+        G: [" 1111", "1    ", "1    ", "1 111", "1   1", "1   1", " 1111"],
+        H: ["1   1", "1   1", "1   1", "11111", "1   1", "1   1", "1   1"],
+        I: ["11111", "  1  ", "  1  ", "  1  ", "  1  ", "  1  ", "11111"],
+        J: [" 1111", "   1 ", "   1 ", "   1 ", "   1 ", "1  1 ", " 11  "],
+        K: ["1   1", "1  1 ", "1 1  ", "11   ", "1 1  ", "1  1 ", "1   1"],
+        L: ["1    ", "1    ", "1    ", "1    ", "1    ", "1    ", "11111"],
+        M: ["1   1", "11 11", "1 1 1", "1   1", "1   1", "1   1", "1   1"],
+        N: ["1   1", "11  1", "1 1 1", "1  11", "1   1", "1   1", "1   1"],
+        O: [" 111 ", "1   1", "1   1", "1   1", "1   1", "1   1", " 111 "],
+        P: ["1111 ", "1   1", "1   1", "1111 ", "1    ", "1    ", "1    "],
+        Q: [" 111 ", "1   1", "1   1", "1   1", "1 1 1", "1  1 ", " 11 1"],
+        R: ["1111 ", "1   1", "1   1", "1111 ", "1 1  ", "1  1 ", "1   1"],
+        S: [" 1111", "1    ", "1    ", " 111 ", "    1", "    1", "1111 "],
+        T: ["11111", "  1  ", "  1  ", "  1  ", "  1  ", "  1  ", "  1  "],
+        U: ["1   1", "1   1", "1   1", "1   1", "1   1", "1   1", " 111 "],
+        V: ["1   1", "1   1", "1   1", "1   1", "1   1", " 1 1 ", "  1  "],
+        W: ["1   1", "1   1", "1   1", "1 1 1", "1 1 1", "1 1 1", " 1 1 "],
+        X: ["1   1", "1   1", " 1 1 ", "  1  ", " 1 1 ", "1   1", "1   1"],
+        Y: ["1   1", "1   1", " 1 1 ", "  1  ", "  1  ", "  1  ", "  1  "],
+        Z: ["11111", "    1", "   1 ", "  1  ", " 1   ", "1    ", "11111"],
+        a: ["     ", "     ", " 111 ", "    1", " 1111", "1   1", " 1111"],
+        b: ["1    ", "1    ", "1111 ", "1   1", "1   1", "1   1", "1111 "],
+        c: ["     ", "     ", " 111 ", "1    ", "1    ", "1    ", " 111 "],
+        d: ["    1", "    1", " 1111", "1   1", "1   1", "1   1", " 1111"],
+        e: ["     ", "     ", " 111 ", "1   1", "11111", "1    ", " 111 "],
+        f: ["  11 ", " 1  1", " 1   ", "1111 ", " 1   ", " 1   ", " 1   "],
+        g: ["     ", "     ", " 1111", "1   1", "1   1", " 1111", "    1"],
+        h: ["1    ", "1    ", "1111 ", "1   1", "1   1", "1   1", "1   1"],
+        i: ["  1  ", "     ", "  1  ", "  1  ", "  1  ", "  1  ", "  1  "],
+        j: ["   1 ", "     ", "   1 ", "   1 ", "   1 ", "1  1 ", " 11  "],
+        k: ["1    ", "1    ", "1  1 ", "1 1  ", "11   ", "1 1  ", "1  1 "],
+        l: ["  1  ", "  1  ", "  1  ", "  1  ", "  1  ", "  1  ", "  1  "],
+        m: ["     ", "     ", "11 1 ", "1 1 1", "1   1", "1   1", "1   1"],
+        n: ["     ", "     ", "1111 ", "1   1", "1   1", "1   1", "1   1"],
+        o: ["     ", "     ", " 111 ", "1   1", "1   1", "1   1", " 111 "],
+        p: ["     ", "     ", "1111 ", "1   1", "1   1", "1111 ", "1    "],
+        q: ["     ", "     ", " 1111", "1   1", "1   1", " 1111", "    1"],
+        r: ["     ", "     ", "11 1 ", "1  1 ", "1    ", "1    ", "1    "],
+        s: ["     ", "     ", " 1111", "1    ", " 111 ", "    1", "1111 "],
+        t: ["  1  ", "  1  ", "1111 ", "  1  ", "  1  ", "  1  ", "  11 "],
+        u: ["     ", "     ", "1   1", "1   1", "1   1", "1   1", " 1111"],
+        v: ["     ", "     ", "1   1", "1   1", "1   1", " 1 1 ", "  1  "],
+        w: ["     ", "     ", "1   1", "1   1", "1 1 1", "1 1 1", " 1 1 "],
+        x: ["     ", "     ", "1   1", " 1 1 ", "  1  ", " 1 1 ", "1   1"],
+        y: ["     ", "     ", "1   1", "1   1", " 1111", "    1", " 111 "],
+        z: ["     ", "     ", "11111", "   1 ", "  1  ", " 1   ", "11111"],
+        " ": ["     ", "     ", "     ", "     ", "     ", "     ", "     "],
+      };
+
+      function textToPoints(text, font, startRow, startCol, scale = 1) {
+        const points = [];
+        let colOffset = startCol;
+        for (let ch of text) {
+          const pattern = font[ch];
+
+          if (pattern) {
+            // Character exists in font - render it
+            for (let r = 0; r < pattern.length; r++) {
+              for (let c = 0; c < pattern[r].length; c++) {
+                if (pattern[r][c] === "1") {
+                  for (let sr = 0; sr < scale; sr++) {
+                    for (let sc = 0; sc < scale; sc++) {
+                      points.push({
+                        row: startRow + r * scale + sr,
+                        col: colOffset + c * scale + sc,
+                      });
+                    }
+                  }
+                }
+              }
+            }
+            colOffset += (pattern[0].length + 1) * scale;
+          } else {
+            // Character not in font (unknown character) - leave space equivalent to average character width
+            colOffset += 6 * scale; // Average character width + spacing
+          }
+        }
+        return points;
+      }
+
+      // Array of words and images to display sequentially
+      const CONTENT_ARRAY = ["Happy", "Birthday", "Kamalesh"];
+      const TOTAL_SEQUENCE_TIME = CONTENT_ARRAY.length * WORD_CYCLE_TIME; // Total time for all items
+
+      let dots = [],
+        speeds = [],
+        positions = [],
+        wordColumns = [], // Track column positions for word points
+        originalSpeeds = []; // Store original speeds for recalculation
+      let noiseDots = [],
+        noisePositions = [],
+        noiseSpeeds = [],
+        globalRotationAngle = 0, // Shared direction for all points
+        globalRotationDirection = Math.random() * 2 * Math.PI; // Random direction for all points
+      let lastTime = null,
+        running = false,
+        startTime = null,
+        elapsedTime = 0;
+
+      // Sequential content management for dynamic array
+      let currentContentIndex = 0;
+      let allContentDots = []; // Array of arrays - one for each content item
+      let allContentSpeeds = [];
+      let allContentPositions = [];
+      let allContentOriginalSpeeds = [];
+
+      const grid = document.getElementById("grid");
+
+      function showInitialText() {
+        grid.innerHTML = "";
+
+        // Create simple HTML text
+        const textElement = document.createElement("p");
+        textElement.textContent = "Tried something.";
+        textElement.style.cssText = `
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: white;
+          font-size: 24px;
+          font-weight: bold;
+          font-family: 'Orbitron', monospace;
+          margin: 0;
+          text-align: center;
+          pointer-events: none;
+        `;
+
+        grid.appendChild(textElement);
+      }
+
+      function setup() {
+        grid.innerHTML = "";
+        dots = [];
+        speeds = [];
+        positions = [];
+        wordColumns = [];
+        noiseDots = [];
+        noisePositions = [];
+        noiseSpeeds = [];
+        globalRotationAngle = 0;
+        globalRotationDirection = Math.random() * 2 * Math.PI; // New random direction each setup
+        allContentDots = [];
+        allContentSpeeds = [];
+        allContentPositions = [];
+        allContentOriginalSpeeds = [];
+
+        // Create noise dots
+        for (let i = 0; i < NOISE_POINTS; i++) {
+          const div = document.createElement("div");
+          div.className = "dot";
+          let randomRow = Math.random() * ROWS;
+          let randomCol = Math.random() * COLS;
+          div.style.left = randomCol * CELL_WIDTH + "px";
+          div.style.top = randomRow * CELL_HEIGHT + "px";
+          grid.appendChild(div);
+          noiseDots.push(div);
+          noisePositions.push({ row: randomRow, col: randomCol });
+          noiseSpeeds.push({
+            rowSpeed: -(Math.random() * NOISE_SPEED + 1),
+            colSpeed: randomCol,
+          });
+        }
+
+        // Setup all content items
+        allContentPoints.forEach((points, idx) => {
+          let itemDots = [],
+            itemSpeeds = [],
+            itemPositions = [],
+            itemColumns = [],
+            itemOriginalSpeeds = [];
+          points.forEach((pt) => {
+            const div = document.createElement("div");
+            div.className = "dot";
+            div.style.left = pt.col * CELL_WIDTH + "px";
+            div.style.display = idx === 0 ? "block" : "none";
+            grid.appendChild(div);
+            let r0 = Math.floor(Math.random() * ROWS);
+            itemPositions.push(r0);
+            itemColumns.push(pt.col); // Track original column position
+            let rT = pt.row;
+            let diff = (rT - r0 + ROWS) % ROWS;
+            if (diff > ROWS / 2) diff = diff - ROWS;
+            let speed = diff / SYNC_TIME;
+            itemSpeeds.push(speed);
+            itemOriginalSpeeds.push({ r0: r0, rT: rT });
+            itemDots.push(div);
+          });
+          allContentDots.push(itemDots);
+          allContentSpeeds.push(itemSpeeds);
+          allContentPositions.push(itemPositions);
+          allContentOriginalSpeeds.push(itemOriginalSpeeds);
+        });
+
+        // Start with first item
+        dots = [...allContentDots[0]];
+        speeds = [...allContentSpeeds[0]];
+        positions = [...allContentPositions[0]];
+        wordColumns = allContentPoints[0].map((pt) => pt.col); // Initialize word columns
+        originalSpeeds = [...allContentOriginalSpeeds[0]];
+        currentContentIndex = 0;
+      }
+
+      function recalculateSpeeds() {
+        // Recalculate speeds based on current positions to sync again
+        speeds = positions.map((currentPos, i) => {
+          let rT = originalSpeeds[i].rT; // Target position
+          let diff = (rT - currentPos + ROWS) % ROWS;
+          if (diff > ROWS / 2) {
+            diff = diff - ROWS; // Take shorter upward path
+          }
+          return diff / SYNC_TIME; // New speed for next sync
+        });
+      }
+
+      function switchToNextContent() {
+        // Hide current item dots
+        dots.forEach((dot) => (dot.style.display = "none"));
+        // Next index
+        let nextIndex = (currentContentIndex + 1) % allContentDots.length;
+        dots = [...allContentDots[nextIndex]];
+        speeds = [...allContentSpeeds[nextIndex]];
+        positions = [...allContentPositions[nextIndex]];
+        wordColumns = allContentPoints[nextIndex].map((pt) => pt.col); // Update word columns for new content
+        originalSpeeds = [...allContentOriginalSpeeds[nextIndex]];
+        currentContentIndex = nextIndex;
+        // Show new item dots and randomize their positions
+        dots.forEach((dot, i) => {
+          dot.style.display = "block";
+          let newStartPos = Math.floor(Math.random() * ROWS);
+          positions[i] = newStartPos;
+          // Recalculate speed for new start position
+          let rT = originalSpeeds[i].rT;
+          let diff = (rT - newStartPos + ROWS) % ROWS;
+          if (diff > ROWS / 2) diff = diff - ROWS;
+          speeds[i] = diff / SYNC_TIME;
+        });
+      }
+
+      function animate(time) {
+        if (!running) return;
+        if (!lastTime) {
+          lastTime = time;
+          startTime = time;
+        }
+        let dt = (time - lastTime) / 1000;
+        elapsedTime = (time - startTime) / 1000;
+        lastTime = time;
+
+        // Calculate current cycle time for sequential items
+        let totalCycleTime = elapsedTime % TOTAL_SEQUENCE_TIME;
+        let itemCycleTime = totalCycleTime % WORD_CYCLE_TIME;
+
+        // Switch items every WORD_CYCLE_TIME seconds
+        let expectedIndex = Math.floor(totalCycleTime / WORD_CYCLE_TIME);
+        if (expectedIndex !== currentContentIndex) {
+          switchToNextContent();
+        }
+
+        positions = positions.map((pos, i) => {
+          let speedMultiplier = 1;
+          // Slow down when word/image is synced (at SYNC_TIME and for HOLD_TIME after)
+          if (
+            itemCycleTime >= SYNC_TIME &&
+            itemCycleTime < SYNC_TIME + HOLD_TIME
+          ) {
+            speedMultiplier = 0.1;
+          }
+
+          let newPos = pos + speeds[i] * dt * speedMultiplier;
+
+          // Add cinematic flow effect to word points too!
+          if (
+            itemCycleTime >= ROTATION_START_TIME &&
+            itemCycleTime < ROTATION_END_TIME
+          ) {
+            let rotationProgress =
+              (itemCycleTime - ROTATION_START_TIME) / ROTATION_TIME;
+            let easeProgress = 0.5 - 0.5 * Math.cos(rotationProgress * Math.PI);
+            let rotationIntensity = Math.sin(easeProgress * Math.PI) * 8;
+            let moveDistance = NOISE_SPEED * dt * rotationIntensity * 3;
+
+            // Move word points in same direction as noise points
+            newPos += Math.sin(globalRotationDirection) * moveDistance;
+            wordColumns[i] += Math.cos(globalRotationDirection) * moveDistance;
+
+            // Wrap column positions
+            while (wordColumns[i] < 0) wordColumns[i] += COLS;
+            while (wordColumns[i] >= COLS) wordColumns[i] -= COLS;
+          }
+
+          while (newPos < 0) newPos += ROWS;
+          while (newPos >= ROWS) newPos -= ROWS;
+          return newPos;
+        });
+
+        // Update noise dots with unified direction cinematic effect
+        noisePositions = noisePositions.map((pos, i) => {
+          let newRow = pos.row;
+          let newCol = pos.col;
+
+          // Check if we're in rotation phase (after complete word cycle)
+          if (
+            itemCycleTime >= ROTATION_START_TIME &&
+            itemCycleTime < ROTATION_END_TIME
+          ) {
+            // Cinematic rotation phase - all points move in same direction
+            let rotationProgress =
+              (itemCycleTime - ROTATION_START_TIME) / ROTATION_TIME;
+
+            // Debug output (only for first point to avoid spam)
+            if (i === 0) {
+              console.log(
+                `Rotation active! Time: ${itemCycleTime.toFixed(
+                  1
+                )}s, Progress: ${rotationProgress.toFixed(2)}`
+              );
+            }
+
+            // Ease-in-out curve for slow-fast-slow effect
+            let easeProgress = 0.5 - 0.5 * Math.cos(rotationProgress * Math.PI);
+            let rotationIntensity = Math.sin(easeProgress * Math.PI) * 8; // Increased intensity
+
+            // All points move in the same random direction - MUCH MORE VISIBLE
+            let moveDistance = NOISE_SPEED * dt * rotationIntensity * 3; // 3x multiplier for visibility
+            newRow += Math.sin(globalRotationDirection) * moveDistance;
+            newCol += Math.cos(globalRotationDirection) * moveDistance;
+
+            // Debug the movement
+            if (i === 0) {
+              console.log(
+                `Moving distance: ${moveDistance.toFixed(
+                  2
+                )}, Direction: ${globalRotationDirection.toFixed(2)}`
+              );
+            }
+          } else {
+            // Normal vertical movement
+            newRow += noiseSpeeds[i].rowSpeed * dt;
+            if (Math.random() < 0.001) {
+              noiseSpeeds[i].rowSpeed = -(Math.random() * NOISE_SPEED + 1);
+            }
+
+            // Reset global direction when starting new cycle
+            if (itemCycleTime < 0.1) {
+              // Near start of new cycle
+              globalRotationDirection = Math.random() * 2 * Math.PI;
+              if (i === 0) {
+                console.log(
+                  `New rotation direction set: ${globalRotationDirection.toFixed(
+                    2
+                  )} radians`
+                );
+              }
+            }
+          }
+
+          // Wrap around screen boundaries
+          while (newRow < 0) newRow += ROWS;
+          while (newRow >= ROWS) newRow -= ROWS;
+          while (newCol < 0) newCol += COLS;
+          while (newCol >= COLS) newCol -= COLS;
+
+          return { row: newRow, col: newCol };
+        });
+
+        dots.forEach((dot, i) => {
+          dot.style.top = positions[i] * CELL_HEIGHT + "px";
+          dot.style.left = wordColumns[i] * CELL_WIDTH + "px"; // Update column positions too!
+        });
+        noiseDots.forEach((dot, i) => {
+          dot.style.top = noisePositions[i].row * CELL_HEIGHT + "px";
+          dot.style.left = noisePositions[i].col * CELL_WIDTH + "px";
+        });
+        requestAnimationFrame(animate);
+      }
+
+      // Music system variables
+      let audioCtx = null;
+      let bgmNodes = null;
+      let currentBGM = null;
+      let uploadedAudioEl = null;
+
+      function ensureAudioCtx() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+
+      function stopBGM() {
+        if (audioCtx && bgmNodes) {
+          try {
+            bgmNodes.forEach((n) => n.disconnect && n.disconnect());
+          } catch (e) {}
+          bgmNodes = null;
+        }
+        if (uploadedAudioEl) {
+          uploadedAudioEl.pause();
+          uploadedAudioEl.currentTime = 0;
+        }
+        currentBGM = null;
+      }
+
+      function playArpLoop() {
+        stopBGM();
+
+        // Load the default audio file from the same folder
+        uploadedAudioEl = new Audio("./guitar.mp3");
+        uploadedAudioEl.loop = true;
+        uploadedAudioEl.volume = 0.4;
+
+        uploadedAudioEl
+          .play()
+          .then(() => {
+            console.log("Default audio file (voice.wav) playing");
+            currentBGM = "default-file";
+          })
+          .catch((error) => {
+            console.error("Error playing default audio file:", error);
+            console.log("Falling back to generated guitar sound...");
+
+            // Fallback to generated audio if file doesn't load
+            playGeneratedGuitar();
+          });
+      }
+
+      function playGeneratedGuitar() {
+        ensureAudioCtx();
+        stopBGM();
+        const ctx = audioCtx;
+        const master = ctx.createGain();
+        master.gain.value = 0.2;
+        master.connect(ctx.destination);
+
+        // Add distortion/overdrive effect for guitar-like sound
+        const waveshaper = ctx.createWaveShaper();
+        const samples = 44100;
+        const curve = new Float32Array(samples);
+        const deg = Math.PI / 180;
+        for (let i = 0; i < samples; i++) {
+          const x = (i * 2) / samples - 1;
+          curve[i] = ((3 + 20) * x * 20 * deg) / (Math.PI + 20 * Math.abs(x));
+        }
+        waveshaper.curve = curve;
+        waveshaper.oversample = "4x";
+
+        // Create a low-pass filter for warmth
+        const filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 3000;
+        filter.Q.value = 1;
+
+        let i = 0;
+        // Guitar-friendly arpeggio with power chord intervals
+        const notes = [
+          329.63, 392.0, 493.88, 587.33, 493.88, 392.0, 329.63, 261.63,
+        ]; // E4, G4, B4, D5, B4, G4, E4, C4
+
+        // Main guitar-like oscillator (square wave for that "electric" feel)
+        const osc = ctx.createOscillator();
+        osc.type = "square";
+        const gain = ctx.createGain();
+        gain.gain.value = 0;
+
+        // Add harmonics for richer guitar tone
+        const harmonic1 = ctx.createOscillator();
+        harmonic1.type = "sawtooth";
+        const harmonicGain1 = ctx.createGain();
+        harmonicGain1.gain.value = 0;
+
+        const harmonic2 = ctx.createOscillator();
+        harmonic2.type = "triangle";
+        const harmonicGain2 = ctx.createGain();
+        harmonicGain2.gain.value = 0;
+
+        // Connect the chain: oscillators -> gains -> waveshaper -> filter -> master
+        osc.connect(gain);
+        harmonic1.connect(harmonicGain1);
+        harmonic2.connect(harmonicGain2);
+
+        gain.connect(waveshaper);
+        harmonicGain1.connect(waveshaper);
+        harmonicGain2.connect(waveshaper);
+
+        waveshaper.connect(filter);
+        filter.connect(master);
+
+        osc.start();
+        harmonic1.start();
+        harmonic2.start();
+
+        // Guitar-like attack and decay
+        const interval = 0.35; // Slightly slower for guitar feel
+        const scheduler = setInterval(() => {
+          const now = ctx.currentTime;
+          const freq = notes[i % notes.length];
+
+          // Set frequencies with slight detuning for richness
+          osc.frequency.setValueAtTime(freq, now);
+          harmonic1.frequency.setValueAtTime(freq * 2.02, now); // Slightly detuned octave
+          harmonic2.frequency.setValueAtTime(freq * 3.01, now); // Slightly detuned fifth
+
+          // Guitar-like envelope: quick attack, sustained tone, gradual decay
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(0.3, now + 0.02); // Quick attack
+          gain.gain.linearRampToValueAtTime(0.15, now + 0.1); // Sustain
+          gain.gain.exponentialRampToValueAtTime(0.01, now + interval - 0.05); // Gradual decay
+
+          // Harmonics with different envelopes
+          harmonicGain1.gain.cancelScheduledValues(now);
+          harmonicGain1.gain.setValueAtTime(0, now);
+          harmonicGain1.gain.linearRampToValueAtTime(0.08, now + 0.03);
+          harmonicGain1.gain.exponentialRampToValueAtTime(
+            0.01,
+            now + interval - 0.1
+          );
+
+          harmonicGain2.gain.cancelScheduledValues(now);
+          harmonicGain2.gain.setValueAtTime(0, now);
+          harmonicGain2.gain.linearRampToValueAtTime(0.05, now + 0.05);
+          harmonicGain2.gain.exponentialRampToValueAtTime(
+            0.01,
+            now + interval - 0.08
+          );
+
+          i++;
+        }, interval * 1000);
+
+        bgmNodes = [
+          osc,
+          gain,
+          harmonic1,
+          harmonicGain1,
+          harmonic2,
+          harmonicGain2,
+          waveshaper,
+          filter,
+          master,
+          { disconnect: () => clearInterval(scheduler) },
+        ];
+        currentBGM = "generated-guitar";
+      }
+
+      function handleUploadedMusic(file) {
+        stopBGM();
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        uploadedAudioEl = new Audio(url);
+        uploadedAudioEl.loop = true;
+        uploadedAudioEl.volume = 0.4;
+        uploadedAudioEl.play();
+        currentBGM = "uploaded";
+      }
+
+      // Music control event listeners
+      document.getElementById("uploadBtn").addEventListener("click", () => {
+        document.getElementById("musicUpload").click();
+      });
+
+      document.getElementById("musicUpload").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          handleUploadedMusic(file);
+          console.log("Uploaded music playing:", file.name);
+        }
+      });
+
+      document
+        .getElementById("defaultMusicBtn")
+        .addEventListener("click", () => {
+          playArpLoop();
+          console.log("Default cyberpunk music playing");
+        });
+
+      document.getElementById("startBtn").onclick = async () => {
+        setup();
+        running = true;
+        lastTime = null;
+        startTime = null;
+        elapsedTime = 0;
+
+        // Start default music if no music is currently playing
+        if (!currentBGM) {
+          playArpLoop();
+        }
+
+        requestAnimationFrame(animate);
+      };
+
+      // Show initial "WISH" text when page loads
+      window.addEventListener("load", () => {
+        showInitialText();
+      });
+    </script>
+  </body>
+</html>
