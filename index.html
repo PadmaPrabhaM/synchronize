@@ -414,6 +414,26 @@
         allContentPositions = [];
         allContentOriginalSpeeds = [];
 
+        // Initialize content points for each item in CONTENT_ARRAY
+        allContentPoints = [];
+        CONTENT_ARRAY.forEach((item) => {
+          if (item.toLowerCase().endsWith(".png") || item.toLowerCase().endsWith(".jpg")) {
+            // Handle image
+            const points = createImagePattern(item);
+            allContentPoints.push(points);
+          } else {
+            // Handle text
+            const points = textToPoints(
+              item,
+              FONT_5x7,
+              Math.floor((ROWS - 7 * SCALE) / 2),
+              Math.floor((COLS - item.length * 6 * SCALE) / 2),
+              SCALE
+            );
+            allContentPoints.push(points);
+          }
+        });
+
         // Create noise dots
         for (let i = 0; i < NOISE_POINTS; i++) {
           const div = document.createElement("div");
