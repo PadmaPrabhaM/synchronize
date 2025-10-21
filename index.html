@@ -166,7 +166,7 @@
     <div class="hud-corner bottom-left"></div>
     <div class="hud-corner bottom-right"></div>
 
-    <h1>🎮 It's Oct 22  🎮</h1>
+    <h1>🎮 It's Oct 22 🎮</h1>
     <div id="grid"></div>
     <button id="startBtn">⚡ Initialize ⚡</button>
 
@@ -205,6 +205,12 @@
         accept="audio/*"
         style="display: none"
       />
+      <input
+        type="file"
+        id="imageUpload"
+        accept="image/*"
+        style="display: none"
+      />
       <button
         id="uploadBtn"
         style="
@@ -214,12 +220,18 @@
           padding: 6px 12px;
           border-radius: 6px;
           cursor: pointer;
-          font-size: 10px;
+          font-size: 9px;
           width: 100%;
-          margin-bottom: 4px;
+          margin-bottom: 3px;
         "
       >
-        Upload
+        🎵 Music
+      </button>
+      <button
+        id="imageBtn"
+        style="display: none;"
+      >
+        🖼️ Image
       </button>
       <button
         id="defaultMusicBtn"
@@ -227,14 +239,14 @@
           background: linear-gradient(135deg, #8b5cf6, #a855f7);
           color: white;
           border: none;
-          padding: 6px 12px;
+          padding: 6px 6px;
           border-radius: 6px;
           cursor: pointer;
-          font-size: 10px;
+          font-size: 9px;
           width: 100%;
         "
       >
-        Default
+        🎶 Default
       </button>
     </div>
 
@@ -255,8 +267,8 @@
       const TOTAL_CYCLE_TIME = 80; // total time for both words
 
       // Cinematic rotation constants
-      const ROTATION_TIME = 6; // seconds for cinematic rotation effect
-      const ROTATION_START_TIME = 25; // Start earlier for testing (was WORD_CYCLE_TIME)
+      const ROTATION_TIME = 7; // seconds for cinematic rotation effect
+      const ROTATION_START_TIME = 27; // Start earlier for testing (was WORD_CYCLE_TIME)
       const ROTATION_END_TIME = ROTATION_START_TIME + ROTATION_TIME; // when rotation ends
 
       // --- 5x5 FONT
@@ -314,6 +326,16 @@
         y: ["     ", "     ", "1   1", "1   1", " 1111", "    1", " 111 "],
         z: ["     ", "     ", "11111", "   1 ", "  1  ", " 1   ", "11111"],
         " ": ["     ", "     ", "     ", "     ", "     ", "     ", "     "],
+        0: [" 111 ", "1   1", "1  11", "1 1 1", "11  1", "1   1", " 111 "],
+        1: ["  1  ", " 11  ", "1 1  ", "  1  ", "  1  ", "  1  ", "11111"],
+        2: [" 111 ", "1   1", "    1", "   1 ", "  1  ", " 1   ", "11111"],
+        3: ["1111 ", "    1", "   1 ", " 111 ", "    1", "1   1", " 111 "],
+        4: ["   1 ", "  11 ", " 1 1 ", "1  1 ", "11111", "   1 ", "   1 "],
+        5: ["11111", "1    ", "1111 ", "    1", "    1", "1   1", " 111 "],
+        6: [" 111 ", "1    ", "1    ", "1111 ", "1   1", "1   1", " 111 "],
+        7: ["11111", "    1", "   1 ", "  1  ", " 1   ", "1    ", "1    "],
+        8: [" 111 ", "1   1", "1   1", " 111 ", "1   1", "1   1", " 111 "],
+        9: [" 111 ", "1   1", "1   1", " 1111", "    1", "    1", " 111 "],
       };
 
       function textToPoints(text, font, startRow, startCol, scale = 1) {
@@ -332,6 +354,7 @@
                       points.push({
                         row: startRow + r * scale + sr,
                         col: colOffset + c * scale + sc,
+                        color: "#ec4899", // Default gamer theme color for text
                       });
                     }
                   }
@@ -347,8 +370,53 @@
         return points;
       }
 
+      // Extract image pixel data and center it - improved from combine.html
+      function extractImageData(img) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Scale to fit while preserving aspect ratio - scaled down to 50% size
+        const scale = Math.min(COLS / img.width, ROWS / img.height) * 0.5;
+        const imgWidth = img.width * scale;
+        const imgHeight = img.height * scale;
+
+        canvas.width = COLS;
+        canvas.height = ROWS;
+
+        // Center the image
+        const offsetX = (COLS - imgWidth) / 2;
+        const offsetY = (ROWS - imgHeight) / 2;
+
+        ctx.drawImage(img, offsetX, offsetY, imgWidth, imgHeight);
+        const data = ctx.getImageData(0, 0, COLS, ROWS);
+
+        const imgColors = [];
+        for (let r = 0; r < ROWS; r++) {
+          for (let c = 0; c < COLS; c++) {
+            const i = (r * COLS + c) * 4;
+            const a = data.data[i + 3];
+            if (a > 100) {
+              imgColors.push({
+                row: r,
+                col: c,
+                color: "#ec4899", // Same gamer theme color for all points
+              });
+            }
+          }
+        }
+        return imgColors;
+      }
+
       // Array of words and images to display sequentially
-      const CONTENT_ARRAY = ["Happy", "Birthday", "Kamalesh"];
+      const CONTENT_ARRAY = [
+        // "cake3.png",
+        // "Happy",
+        // "Birthday",
+        // "Kamalesh",
+        // "Level 22",
+        "icon.png",
+        "enjoy"
+      ];
       const TOTAL_SEQUENCE_TIME = CONTENT_ARRAY.length * WORD_CYCLE_TIME; // Total time for all items
 
       let dots = [],
@@ -380,7 +448,7 @@
 
         // Create simple HTML text
         const textElement = document.createElement("p");
-        textElement.textContent = "Tried something.";
+        textElement.textContent = "It's not in the chaos, it's in the perspective. Hence, when motivation meets philosophy everything aligns.";
         textElement.style.cssText = `
           position: absolute;
           top: 50%;
@@ -393,6 +461,7 @@
           margin: 0;
           text-align: center;
           pointer-events: none;
+          line-height: 1.7;
         `;
 
         grid.appendChild(textElement);
@@ -416,24 +485,58 @@
 
         // Initialize content points for each item in CONTENT_ARRAY
         allContentPoints = [];
-        CONTENT_ARRAY.forEach((item) => {
-          if (item.toLowerCase().endsWith(".png") || item.toLowerCase().endsWith(".jpg")) {
-            // Handle image
-            const points = createImagePattern(item);
-            allContentPoints.push(points);
-          } else {
-            // Handle text
-            const points = textToPoints(
-              item,
-              FONT_5x7,
-              Math.floor((ROWS - 7 * SCALE) / 2),
-              Math.floor((COLS - item.length * 6 * SCALE) / 2),
-              SCALE
-            );
-            allContentPoints.push(points);
-          }
-        });
 
+        // Process content items sequentially to handle async image loading
+        const processContentItems = async () => {
+          for (const item of CONTENT_ARRAY) {
+            if (
+              item.toLowerCase().endsWith(".png") ||
+              item.toLowerCase().endsWith(".jpg")
+            ) {
+              // Handle image with improved extraction from combine.html
+              try {
+                const points = await new Promise((resolve, reject) => {
+                  const img = new Image();
+                  img.onload = () => {
+                    try {
+                      const imagePoints = extractImageData(img);
+                      resolve(imagePoints);
+                    } catch (error) {
+                      reject(error);
+                    }
+                  };
+                  img.onerror = () =>
+                    reject(new Error(`Failed to load image: ${item}`));
+                  img.src = item;
+                });
+                allContentPoints.push(points);
+              } catch (error) {
+                console.error("Error loading image:", error);
+                // Add fallback empty array for failed images
+                allContentPoints.push([]);
+              }
+            } else {
+              // Handle text
+              const points = textToPoints(
+                item,
+                FONT_5x7,
+                Math.floor((ROWS - 7 * SCALE) / 2),
+                Math.floor((COLS - item.length * 6 * SCALE) / 2),
+                SCALE
+              );
+              allContentPoints.push(points);
+            }
+          }
+
+          // Continue setup after all content is loaded
+          setupContentDots();
+        };
+
+        // Start async processing
+        processContentItems();
+      }
+
+      function setupContentDots() {
         // Create noise dots
         for (let i = 0; i < NOISE_POINTS; i++) {
           const div = document.createElement("div");
@@ -442,6 +545,10 @@
           let randomCol = Math.random() * COLS;
           div.style.left = randomCol * CELL_WIDTH + "px";
           div.style.top = randomRow * CELL_HEIGHT + "px";
+
+          // Use same gamer theme color for all noise dots
+          div.style.backgroundColor = "#ec4899";
+
           grid.appendChild(div);
           noiseDots.push(div);
           noisePositions.push({ row: randomRow, col: randomCol });
@@ -463,6 +570,10 @@
             div.className = "dot";
             div.style.left = pt.col * CELL_WIDTH + "px";
             div.style.display = idx === 0 ? "block" : "none";
+
+            // Use same gamer theme color for all dots
+            div.style.backgroundColor = "#ec4899";
+
             grid.appendChild(div);
             let r0 = Math.floor(Math.random() * ROWS);
             itemPositions.push(r0);
@@ -518,6 +629,10 @@
           dot.style.display = "block";
           let newStartPos = Math.floor(Math.random() * ROWS);
           positions[i] = newStartPos;
+
+          // Use same gamer theme color for all content dots
+          dot.style.backgroundColor = "#ec4899";
+
           // Recalculate speed for new start position
           let rT = originalSpeeds[i].rT;
           let diff = (rT - newStartPos + ROWS) % ROWS;
@@ -861,6 +976,39 @@
           playArpLoop();
           console.log("Default cyberpunk music playing");
         });
+
+      // Image upload event listeners
+      document.getElementById("imageBtn").addEventListener("click", () => {
+        document.getElementById("imageUpload").click();
+      });
+
+      document.getElementById("imageUpload").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          // Replace the first image in CONTENT_ARRAY
+          const imageIndex = CONTENT_ARRAY.findIndex(
+            (item) =>
+              item.toLowerCase().endsWith(".png") ||
+              item.toLowerCase().endsWith(".jpg")
+          );
+
+          if (imageIndex !== -1) {
+            CONTENT_ARRAY[imageIndex] = url;
+          } else {
+            // If no image exists, replace "Birthday" with the uploaded image
+            CONTENT_ARRAY[2] = url;
+          }
+
+          console.log(
+            "Image uploaded and ready for next animation:",
+            file.name
+          );
+          alert(
+            "🖼️ Image uploaded! Click Initialize to see it in the animation sequence."
+          );
+        }
+      });
 
       document.getElementById("startBtn").onclick = async () => {
         setup();
